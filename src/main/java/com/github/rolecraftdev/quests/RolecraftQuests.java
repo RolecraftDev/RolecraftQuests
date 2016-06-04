@@ -29,11 +29,17 @@ package com.github.rolecraftdev.quests;
 import com.github.rolecraftdev.quests.listener.BlockListener;
 import com.github.rolecraftdev.quests.listener.EnchantListener;
 import com.github.rolecraftdev.quests.listener.EntityListener;
+import com.github.rolecraftdev.quests.listener.ExperienceListener;
+import com.github.rolecraftdev.quests.listener.GuildListener;
 import com.github.rolecraftdev.quests.listener.InventoryListener;
 import com.github.rolecraftdev.quests.listener.PlayerListener;
+import com.github.rolecraftdev.quests.listener.ProfessionListener;
+import com.github.rolecraftdev.quests.quest.QuestingHandler;
 
 import com.volumetricpixels.questy.QuestManager;
 import com.volumetricpixels.questy.questy.SimpleQuestManager;
+import com.volumetricpixels.questy.questy.loader.JSQuestLoader;
+import com.volumetricpixels.questy.questy.loader.YMLQuestLoader;
 import com.volumetricpixels.questy.storage.ProgressStore;
 import com.volumetricpixels.questy.storage.store.SimpleProgressStore;
 
@@ -52,6 +58,7 @@ import java.io.File;
 public final class RolecraftQuests extends JavaPlugin {
     private QuestManager questManager;
     private ProgressStore progressStore;
+    private QuestingHandler questingHandler;
 
     /**
      * @since 0.1.0
@@ -60,6 +67,24 @@ public final class RolecraftQuests extends JavaPlugin {
     public void onEnable() {
         final File dataFolder = this.getDataFolder();
         final File storageFolder = new File(dataFolder, "data");
+        final File questsFolder = new File(dataFolder, "quests");
+
+        if (!storageFolder.exists() && !storageFolder.mkdirs()) {
+            getLogger().severe("Could not create data storage folder");
+            getLogger().severe("RolecraftQuests will not function correctly");
+            return;
+        }
+
+        if (!questsFolder.exists() && !questsFolder.mkdirs()) {
+            getLogger().severe("Could not create quest script folder");
+            getLogger().severe("RolecraftQuests will not function correctly");
+            return;
+        }
+
+        questManager.addLoader(new JSQuestLoader(questManager));
+        questManager.addLoader(new YMLQuestLoader(questManager));
+
+        questManager.loadQuests(questsFolder);
 
         // we'll use a different implementation of progress store (SQLite / MySQL) when it is added to Questy
         this.progressStore = new SimpleProgressStore(storageFolder);
@@ -67,14 +92,19 @@ public final class RolecraftQuests extends JavaPlugin {
 
         this.questManager.loadProgression();
 
+        this.questingHandler = new QuestingHandler(this);
+
         final Server server = getServer();
         final PluginManager pluginManager = server.getPluginManager();
 
         pluginManager.registerEvents(new BlockListener(this), this);
         pluginManager.registerEvents(new EnchantListener(this), this);
         pluginManager.registerEvents(new EntityListener(this), this);
+        pluginManager.registerEvents(new ExperienceListener(this), this);
+        pluginManager.registerEvents(new GuildListener(this), this);
         pluginManager.registerEvents(new InventoryListener(this), this);
         pluginManager.registerEvents(new PlayerListener(this), this);
+        pluginManager.registerEvents(new ProfessionListener(this), this);
     }
 
     /**

@@ -60,6 +60,10 @@ public final class Quest {
         this.objectives = objectives;
 
         predicate = quester -> {
+            if (questManager.hasCompleted(this, quester)) {
+                return false; // TODO: repeatable quests
+            }
+
             if (prerequisites != null && prerequisites.length > 0) {
                 for (String qst : prerequisites) {
                     if (!questManager.hasCompleted(questManager.getQuest(qst),
