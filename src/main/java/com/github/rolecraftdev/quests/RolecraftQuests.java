@@ -31,6 +31,8 @@ import com.volumetricpixels.questy.questy.SimpleQuestManager;
 import com.volumetricpixels.questy.storage.ProgressStore;
 import com.volumetricpixels.questy.storage.store.SimpleProgressStore;
 
+import org.bukkit.Server;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -58,6 +60,9 @@ public final class RolecraftQuests extends JavaPlugin {
         this.questManager = new SimpleQuestManager(progressStore);
 
         this.questManager.loadProgression();
+
+        final Server server = getServer();
+        final PluginManager pluginManager = server.getPluginManager();
     }
 
     /**
