@@ -26,7 +26,14 @@
  */
 package com.github.rolecraftdev.quests;
 
+import com.volumetricpixels.questy.QuestManager;
+import com.volumetricpixels.questy.questy.SimpleQuestManager;
+import com.volumetricpixels.questy.storage.ProgressStore;
+import com.volumetricpixels.questy.storage.store.SimpleProgressStore;
+
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.io.File;
 
 /**
  * Main plugin class for RolecraftQuests, the quest add-on for the Rolecraft RPG
@@ -35,11 +42,22 @@ import org.bukkit.plugin.java.JavaPlugin;
  * @since 0.1.0
  */
 public final class RolecraftQuests extends JavaPlugin {
+    private QuestManager questManager;
+    private ProgressStore progressStore;
+
     /**
      * @since 0.1.0
      */
     @Override
     public void onEnable() {
+        final File dataFolder = this.getDataFolder();
+        final File storageFolder = new File(dataFolder, "data");
+
+        // we'll use a different implementation of progress store (SQLite / MySQL) when it is added to Questy
+        this.progressStore = new SimpleProgressStore(storageFolder);
+        this.questManager = new SimpleQuestManager(progressStore);
+
+        this.questManager.loadProgression();
     }
 
     /**
@@ -47,5 +65,26 @@ public final class RolecraftQuests extends JavaPlugin {
      */
     @Override
     public void onDisable() {
+        this.questManager.saveProgression();
+    }
+
+    /**
+     * Get the {@link QuestManager} from Questy used for RolecraftQuests.
+     *
+     * @return RolecraftQuests' {@link QuestManager} instance
+     * @since 0.1.0
+     */
+    public QuestManager getQuestManager() {
+        return this.questManager;
+    }
+
+    /**
+     * Get the {@link ProgressStore} from Questy used for RolecraftQuests.
+     *
+     * @return RolecraftQuests' {@link ProgressStore} instance
+     * @since 0.1.0
+     */
+    public ProgressStore getProgressStore() {
+        return this.progressStore;
     }
 }
