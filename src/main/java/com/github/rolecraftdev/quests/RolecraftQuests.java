@@ -26,6 +26,12 @@
  */
 package com.github.rolecraftdev.quests;
 
+import com.github.rolecraftdev.quests.listener.BlockListener;
+import com.github.rolecraftdev.quests.listener.EnchantListener;
+import com.github.rolecraftdev.quests.listener.EntityListener;
+import com.github.rolecraftdev.quests.listener.InventoryListener;
+import com.github.rolecraftdev.quests.listener.PlayerListener;
+
 import com.volumetricpixels.questy.QuestManager;
 import com.volumetricpixels.questy.questy.SimpleQuestManager;
 import com.volumetricpixels.questy.storage.ProgressStore;
@@ -63,6 +69,12 @@ public final class RolecraftQuests extends JavaPlugin {
 
         final Server server = getServer();
         final PluginManager pluginManager = server.getPluginManager();
+
+        pluginManager.registerEvents(new BlockListener(this), this);
+        pluginManager.registerEvents(new EnchantListener(this), this);
+        pluginManager.registerEvents(new EntityListener(this), this);
+        pluginManager.registerEvents(new InventoryListener(this), this);
+        pluginManager.registerEvents(new PlayerListener(this), this);
     }
 
     /**
