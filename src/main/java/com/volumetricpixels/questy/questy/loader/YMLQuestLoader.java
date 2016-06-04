@@ -19,6 +19,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -81,6 +82,20 @@ public class YMLQuestLoader implements QuestLoader {
                 if (next != null) {
                     oc.next(builder.objective(next.toString()));
                 }
+            }
+        }
+
+        List<?> prerequisites = (List) map.get("prerequisites");
+        if (prerequisites != null) {
+            for (Object obj : prerequisites) {
+                builder.requireCompletion(obj.toString());
+            }
+        }
+
+        List<?> rewards = (List) map.get("rewards");
+        if (rewards != null) {
+            for (Object obj : rewards) {
+                builder.reward(obj.toString());
             }
         }
 

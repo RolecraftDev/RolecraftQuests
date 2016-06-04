@@ -8,6 +8,7 @@ package com.volumetricpixels.questy;
 import com.volumetricpixels.questy.objective.Objective;
 import com.volumetricpixels.questy.objective.ObjectiveProgress;
 
+import java.util.List;
 import java.util.function.Predicate;
 
 /**
@@ -33,6 +34,10 @@ public final class Quest {
      */
     private final Objective[] objectives;
     /**
+     * All rewards for this quest.
+     */
+    private final String[] rewards;
+    /**
      * A {@link Predicate} specifying the test for whether a quester can embark
      * on this Quest by checking the requirements.
      */
@@ -53,11 +58,12 @@ public final class Quest {
      * @param prerequisites quests which must be completed to start the Quest
      */
     public Quest(QuestManager questManager, String name, String description,
-            Objective[] objectives, String[] prerequisites) {
+            Objective[] objectives, String[] prerequisites, String[] rewards) {
         this.questManager = questManager;
         this.name = name;
         this.description = description;
         this.objectives = objectives;
+        this.rewards = rewards;
 
         predicate = quester -> {
             if (questManager.hasCompleted(this, quester)) {
@@ -115,6 +121,17 @@ public final class Quest {
      */
     public Objective[] getObjectives() {
         return objectives.clone();
+    }
+
+    /**
+     * Gets an array of all rewards given for completing this quest. Note that
+     * modifying the returned array will have NO effect on the rewards given
+     * for the quest as it is only a clone.
+     *
+     * @return an array of rewards for this quest
+     */
+    public String[] getRewards() {
+        return rewards.clone();
     }
 
     /**

@@ -71,6 +71,10 @@ public final class QuestBuilder {
      * this {@link Quest}.
      */
     private final Set<String> prerequisites = new HashSet<>();
+    /**
+     * A {@link List} of rewards given for completing this {@link Quest}.
+     */
+    private final List<String> rewards = new ArrayList<>();
 
     /**
      * The name of the {@link Quest} to be built.
@@ -118,6 +122,17 @@ public final class QuestBuilder {
      */
     public QuestBuilder description(String description) {
         this.description = description;
+        return this;
+    }
+
+    /**
+     * Adds the given reward to this builder's {@link List} of quest rewards.
+     *
+     * @param reward the reward to add
+     * @return this {@link QuestBuilder} object
+     */
+    public QuestBuilder reward(String reward) {
+        rewards.add(reward);
         return this;
     }
 
@@ -179,7 +194,8 @@ public final class QuestBuilder {
             objs[i] = objectives.get(i).build();
         }
         return built = new Quest(questManager, name, description, objs,
-                prerequisites.toArray(new String[prerequisites.size()]));
+                prerequisites.toArray(new String[prerequisites.size()]),
+                rewards.toArray(new String[rewards.size()]));
     }
 
     /**

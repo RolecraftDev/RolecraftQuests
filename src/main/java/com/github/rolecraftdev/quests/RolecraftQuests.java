@@ -35,6 +35,7 @@ import com.github.rolecraftdev.quests.listener.InventoryListener;
 import com.github.rolecraftdev.quests.listener.PlayerListener;
 import com.github.rolecraftdev.quests.listener.ProfessionListener;
 import com.github.rolecraftdev.quests.quest.QuestingHandler;
+import com.github.rolecraftdev.quests.quest.QuestingListener;
 
 import com.volumetricpixels.questy.QuestManager;
 import com.volumetricpixels.questy.questy.SimpleQuestManager;
@@ -97,6 +98,10 @@ public final class RolecraftQuests extends JavaPlugin {
         final Server server = getServer();
         final PluginManager pluginManager = server.getPluginManager();
 
+        // deals with events regarding starting, finishing quests, giving rewards etc
+        pluginManager.registerEvents(new QuestingListener(this), this);
+
+        // listeners dealing with updating quest objectives
         pluginManager.registerEvents(new BlockListener(this), this);
         pluginManager.registerEvents(new EnchantListener(this), this);
         pluginManager.registerEvents(new EntityListener(this), this);
