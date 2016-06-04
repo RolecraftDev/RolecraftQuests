@@ -1,0 +1,17 @@
+# Eclipse
+bin/
+.classpath
+.project
+.settings/
+
+# Maven
+target/
+dependency-reduced-pom.xml
+
+# OS X
+.DS_Store
+
+# IntelliJ
+.idea/
+*.iml
+out/
