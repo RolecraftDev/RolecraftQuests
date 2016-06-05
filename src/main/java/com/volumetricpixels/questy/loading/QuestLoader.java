@@ -6,6 +6,7 @@
 package com.volumetricpixels.questy.loading;
 
 import com.volumetricpixels.questy.Quest;
+import com.volumetricpixels.questy.util.Serialization;
 
 import java.io.File;
 import java.util.Map;
@@ -41,9 +42,6 @@ public interface QuestLoader {
      *         ignoring case, otherwise {@code false}
      */
     default boolean checkExtension(File file, String extension) {
-        if (!extension.startsWith(".")) {
-            extension = ".".concat(extension);
-        }
-        return file.getName().toLowerCase().endsWith(extension.toLowerCase());
+        return Serialization.checkExtension(file, extension);
     }
 }

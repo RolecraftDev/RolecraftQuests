@@ -26,6 +26,7 @@
  */
 package com.github.rolecraftdev.quests.quest;
 
+import com.github.rolecraftdev.RolecraftCore;
 import com.github.rolecraftdev.quests.RolecraftQuests;
 
 import com.volumetricpixels.questy.Quest;
@@ -45,6 +46,7 @@ import java.util.UUID;
  */
 public final class QuestingHandler {
     private final RolecraftQuests plugin;
+    private final RolecraftCore core;
     private final QuestManager questManager;
 
     /**
@@ -56,6 +58,7 @@ public final class QuestingHandler {
      */
     public QuestingHandler(@Nonnull final RolecraftQuests plugin) {
         this.plugin = plugin;
+        this.core = plugin.getCore();
         this.questManager = plugin.getQuestManager();
     }
 

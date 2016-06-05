@@ -3,4 +3,5 @@ version: 0.1.0
 description: Quests add-on for Rolecraft
 authors: [DziNeIT]
 depend: RolecraftCore
+softdepend: Vault
 main: com.github.rolecraftdev.quests.RolecraftQuests

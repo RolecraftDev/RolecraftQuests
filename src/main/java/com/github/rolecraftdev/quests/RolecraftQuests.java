@@ -26,6 +26,8 @@
  */
 package com.github.rolecraftdev.quests;
 
+import com.github.rolecraftdev.RolecraftCore;
+import com.github.rolecraftdev.quests.dungeon.DungeonManager;
 import com.github.rolecraftdev.quests.listener.BlockListener;
 import com.github.rolecraftdev.quests.listener.EnchantListener;
 import com.github.rolecraftdev.quests.listener.EntityListener;
@@ -57,8 +59,15 @@ import java.io.File;
  * @since 0.1.0
  */
 public final class RolecraftQuests extends JavaPlugin {
+    /**
+     * @since 0.1.0
+     */
+    public static final String CORE_PLUGIN_NAME = "RolecraftCore";
+
+    private RolecraftCore core;
     private QuestManager questManager;
     private ProgressStore progressStore;
+    private DungeonManager dungeonManager;
     private QuestingHandler questingHandler;
 
     /**
@@ -66,9 +75,16 @@ public final class RolecraftQuests extends JavaPlugin {
      */
     @Override
     public void onEnable() {
+        final Server server = getServer();
+        final PluginManager pluginManager = server.getPluginManager();
+
+        // plugin.yml has dependency for RolecraftCore so this should always work
+        this.core = (RolecraftCore) pluginManager.getPlugin(CORE_PLUGIN_NAME);
+
         final File dataFolder = this.getDataFolder();
         final File storageFolder = new File(dataFolder, "data");
         final File questsFolder = new File(dataFolder, "quests");
+        final File dungeonsFolder = new File(dataFolder, "dungeons");
 
         if (!storageFolder.exists() && !storageFolder.mkdirs()) {
             getLogger().severe("Could not create data storage folder");
@@ -82,10 +98,20 @@ public final class RolecraftQuests extends JavaPlugin {
             return;
         }
 
+        if (!dungeonsFolder.exists() && !dungeonsFolder.mkdirs()) {
+            getLogger().severe("Could not create dungeons folder");
+            getLogger().severe("RolecraftQuests will not function correctly");
+            return;
+        }
+
         questManager.addLoader(new JSQuestLoader(questManager));
         questManager.addLoader(new YMLQuestLoader(questManager));
 
         questManager.loadQuests(questsFolder);
+
+        // create & load dungeons AFTER quests as dungeons depend on quests
+        // (progression doesn't matter at this point)
+        this.dungeonManager = new DungeonManager(this, dungeonsFolder);
 
         // we'll use a different implementation of progress store (SQLite / MySQL) when it is added to Questy
         this.progressStore = new SimpleProgressStore(storageFolder);
@@ -94,9 +120,6 @@ public final class RolecraftQuests extends JavaPlugin {
         this.questManager.loadProgression();
 
         this.questingHandler = new QuestingHandler(this);
-
-        final Server server = getServer();
-        final PluginManager pluginManager = server.getPluginManager();
 
         // deals with events regarding starting, finishing quests, giving rewards etc
         pluginManager.registerEvents(new QuestingListener(this), this);
@@ -118,6 +141,16 @@ public final class RolecraftQuests extends JavaPlugin {
     @Override
     public void onDisable() {
         this.questManager.saveProgression();
+    }
+
+    /**
+     * Get the {@link RolecraftCore} core Rolecraft plugin object.
+     *
+     * @return this server's {@link RolecraftCore} plugin instance
+     * @since 0.1.0
+     */
+    public RolecraftCore getCore() {
+        return this.core;
     }
 
     /**

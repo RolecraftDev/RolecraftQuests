@@ -111,6 +111,22 @@ public final class Serialization {
     }
 
     /**
+     * Utility method to check if the name of the given {@link File} ends with
+     * the given {@link String}, ignoring case.
+     *
+     * @param file the {@link File} to check the extension of
+     * @param extension the {@link String} to check the extension for
+     * @return {@code true} if the given file's name ends with the given string,
+     *         ignoring case, otherwise {@code false}
+     */
+    public static boolean checkExtension(File file, String extension) {
+        if (!extension.startsWith(".")) {
+            extension = ".".concat(extension);
+        }
+        return file.getName().toLowerCase().endsWith(extension.toLowerCase());
+    }
+
+    /**
      * This class never needs to be instantiated.
      */
     private Serialization() {
