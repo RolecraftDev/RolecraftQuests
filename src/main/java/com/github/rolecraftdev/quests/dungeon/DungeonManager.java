@@ -27,9 +27,9 @@
 package com.github.rolecraftdev.quests.dungeon;
 
 import com.github.rolecraftdev.RolecraftCore;
-import com.github.rolecraftdev.data.Region2D;
-import com.github.rolecraftdev.data.storage.YamlFile;
 import com.github.rolecraftdev.quests.RolecraftQuests;
+import com.github.rolecraftdev.util.Region2D;
+import com.github.rolecraftdev.util.serial.YamlFile;
 
 import com.volumetricpixels.questy.Quest;
 

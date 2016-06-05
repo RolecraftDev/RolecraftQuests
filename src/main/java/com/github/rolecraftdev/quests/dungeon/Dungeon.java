@@ -26,7 +26,7 @@
  */
 package com.github.rolecraftdev.quests.dungeon;
 
-import com.github.rolecraftdev.data.Region2D;
+import com.github.rolecraftdev.util.Region2D;
 
 import com.volumetricpixels.questy.Quest;
 
