@@ -28,15 +28,32 @@ package com.github.rolecraftdev.quests.quest;
 
 import com.github.rolecraftdev.quests.RolecraftQuests;
 
+import com.volumetricpixels.questy.Quest;
+import com.volumetricpixels.questy.event.Listen;
+import com.volumetricpixels.questy.event.quest.QuestCompleteEvent;
+
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
+
+import java.util.UUID;
+import java.util.regex.Pattern;
 
 /**
  * Listens for events which may start or hand in a quest etc, e.g. interactions
- * with signs may start a quest.
+ * with signs. Also deals with quest rewards.
  *
  * @since 0.1.0
  */
 public final class QuestingListener implements Listener {
+    /**
+     * The integer returned by {@link PlayerInventory#firstEmpty()} if the
+     * player has a full inventory.
+     */
+    private static final int INVENTORY_EMPTY = -1;
+
     /**
      * The main {@link RolecraftQuests} plugin instance.
      */
@@ -50,5 +67,52 @@ public final class QuestingListener implements Listener {
      */
     public QuestingListener(final RolecraftQuests plugin) {
         this.plugin = plugin;
+    }
+
+    @Listen(monitor = true)
+    public void onQuestComplete(final QuestCompleteEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
+
+        final Quest questInfo = event.getQuestInfo();
+        final String[] rewards = questInfo.getRewards();
+        final String quester = event.getQuester();
+        final UUID questerId = UUID.fromString(quester);
+        final Player player = this.plugin.getServer().getPlayer(questerId);
+
+        if (player == null) {
+            // the player has completed a quest without being online. w0t.
+            // todo: implement a waiting list so if this does happen the player can be rewarded when they next log on
+            return;
+        }
+
+        if (rewards == null || rewards.length == 0) {
+            return;
+        }
+
+        for (final String reward : rewards) {
+            final String[] split = reward.split(Pattern.quote("-"));
+
+            try {
+                final String rewardName = split[0];
+                final int quantity = Integer.parseInt(split[1]);
+                final Material material = Material.getMaterial(rewardName);
+                final ItemStack stack = new ItemStack(material, quantity);
+
+                final PlayerInventory inventory = player.getInventory();
+                if (inventory.firstEmpty() == INVENTORY_EMPTY) {
+                    // TODO: implement a waiting list so they can be rewarded later
+                    continue; // continue looping so we can later add other rewards to waiting list
+                }
+
+                player.getInventory().addItem(stack);
+            } catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
+                // the person who wrote the quest messed up, smh
+                this.plugin.getLogger()
+                        .severe("The quest '" + questInfo.getName()
+                                + "' is incorrectly configured. Rewards for this quest will not work");
+            }
+        }
     }
 }
