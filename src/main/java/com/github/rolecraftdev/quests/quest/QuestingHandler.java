@@ -37,6 +37,7 @@ import org.bukkit.entity.Player;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.UUID;
 
 /**
@@ -63,6 +64,12 @@ public final class QuestingHandler {
     }
 
     // TODO: doc
+
+    @Nonnull
+    public Collection<QuestInstance> getQuests(@Nonnull final Player quester) {
+        return this.questManager
+                .getQuestInstances(quester.getUniqueId().toString());
+    }
 
     @Nullable
     public QuestInstance beginQuest(@Nonnull final String questName,

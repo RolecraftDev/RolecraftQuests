@@ -99,7 +99,7 @@
         <dependency>
             <groupId>com.github.rolecraftdev</groupId>
             <artifactId>RolecraftCore</artifactId>
-            <version>0.0.5-ALPHA-SNAPSHOT</version>
+            <version>0.1.0-ALPHA-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

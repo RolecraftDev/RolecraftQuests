@@ -26,9 +26,19 @@
  */
 package com.github.rolecraftdev.quests.listener;
 
+import com.github.rolecraftdev.event.profession.PlayerProfessionSelectEvent;
 import com.github.rolecraftdev.quests.RolecraftQuests;
+import com.github.rolecraftdev.quests.quest.QuestingHandler;
 
+import com.volumetricpixels.questy.QuestInstance;
+import com.volumetricpixels.questy.objective.ObjectiveProgress;
+
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+
+import java.util.Collection;
 
 /**
  * Listens for profession-related events in order to update quests for Rolecraft.
@@ -40,6 +50,10 @@ public final class ProfessionListener implements Listener {
      * The main {@link RolecraftQuests} plugin instance.
      */
     private final RolecraftQuests plugin;
+    /**
+     * The {@link RolecraftQuests} plugin's {@link QuestingHandler}.
+     */
+    private final QuestingHandler questingHandler;
 
     /**
      * Constructor.
@@ -49,5 +63,27 @@ public final class ProfessionListener implements Listener {
      */
     public ProfessionListener(final RolecraftQuests plugin) {
         this.plugin = plugin;
+        this.questingHandler = plugin.getQuestingHandler();
+    }
+
+    /**
+     * @since 0.1.0
+     */
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onProfessionSelect(final PlayerProfessionSelectEvent event) {
+        final Player player = event.getPlayer();
+        final Collection<QuestInstance> quests = this.questingHandler
+                .getQuests(player);
+
+        for (final QuestInstance quest : quests) {
+            final ObjectiveProgress objective = quest.getCurrentObjective();
+            objective.getOutcomeProgresses().stream()
+                    .filter(outcome -> outcome.getInfo().getType()
+                            .equalsIgnoreCase("selectprofession"))
+                    .forEach(outcome -> {
+                        outcome.setProgress(1);
+                        quest.objectiveComplete(objective, outcome);
+                    });
+        }
     }
 }
