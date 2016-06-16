@@ -69,6 +69,7 @@ public final class RolecraftQuests extends JavaPlugin {
     private ProgressStore progressStore;
     private DungeonManager dungeonManager;
     private QuestingHandler questingHandler;
+    private RQDataUpdater dataUpdater;
 
     /**
      * @since 0.1.0
@@ -133,6 +134,9 @@ public final class RolecraftQuests extends JavaPlugin {
         pluginManager.registerEvents(new InventoryListener(this), this);
         pluginManager.registerEvents(new PlayerListener(this), this);
         pluginManager.registerEvents(new ProfessionListener(this), this);
+
+        this.dataUpdater = new RQDataUpdater(this);
+        this.dataUpdater.runTaskTimerAsynchronously(this, 6000L, 6000L); // 5 min delay
     }
 
     /**
@@ -140,6 +144,9 @@ public final class RolecraftQuests extends JavaPlugin {
      */
     @Override
     public void onDisable() {
+        this.dataUpdater.cancel();
+
+        this.dungeonManager.cleanup();
         this.questManager.saveProgression();
     }
 
@@ -171,5 +178,27 @@ public final class RolecraftQuests extends JavaPlugin {
      */
     public ProgressStore getProgressStore() {
         return this.progressStore;
+    }
+
+    /**
+     * Get the {@link DungeonManager} used for this RolecraftQuests instance.
+     *
+     * @return RolecraftQuests' {@link DungeonManager} instance
+     * @since 0.1.0
+     */
+    public DungeonManager getDungeonManager() {
+        return dungeonManager;
+    }
+
+    /**
+     * Get the {@link QuestingHandler} used for this RolecraftQuests instance.
+     * This handler bridges the gap between the Questy framework and the actual
+     * plugin.
+     *
+     * @return RolecraftQuests' {@link QuestingHandler} instance
+     * @since 0.1.0
+     */
+    public QuestingHandler getQuestingHandler() {
+        return questingHandler;
     }
 }

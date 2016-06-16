@@ -60,9 +60,21 @@ import static com.volumetricpixels.questy.util.Serialization.checkExtension;
  * @since 0.1.0
  */
 public final class DungeonManager {
+    /**
+     * The associated {@link RolecraftQuests} plugin.
+     */
     private final RolecraftQuests plugin;
+    /**
+     * The associated core {@link RolecraftCore} plugin.
+     */
     private final RolecraftCore core;
+    /**
+     * A {@link Map} of names of dungeons to their {@link Dungeon} objects.
+     */
     private final Map<String, Dungeon> dungeons;
+    /**
+     * A reference to the directory in which dungeons are saved.
+     */
     private final File dungeonsDirectory;
 
     /**
