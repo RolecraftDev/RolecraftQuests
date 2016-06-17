@@ -31,6 +31,11 @@ import com.github.rolecraftdev.quests.RolecraftQuests;
 import com.volumetricpixels.questy.Quest;
 import com.volumetricpixels.questy.event.Listen;
 import com.volumetricpixels.questy.event.quest.QuestCompleteEvent;
+import com.volumetricpixels.questy.event.quest.QuestStartEvent;
+import com.volumetricpixels.questy.event.quest.objective.ObjectiveCompleteEvent;
+import com.volumetricpixels.questy.event.quest.objective.ObjectiveStartEvent;
+import com.volumetricpixels.questy.objective.Objective;
+import com.volumetricpixels.questy.objective.Outcome;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -69,6 +74,27 @@ public final class QuestingListener implements Listener {
         this.plugin = plugin;
     }
 
+    /**
+     * @since 0.1.0
+     */
+    @Listen(monitor = true)
+    public void onQuestStart(final QuestStartEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
+
+        final Quest questInfo = event.getQuestInfo();
+        final String message = questInfo.getBeginMessage();
+        if (message != null) {
+            final Player player = plugin.getServer()
+                    .getPlayer(UUID.fromString(event.getQuester()));
+            player.sendMessage(questInfo.getBeginMessage());
+        }
+    }
+
+    /**
+     * @since 0.1.0
+     */
     @Listen(monitor = true)
     public void onQuestComplete(final QuestCompleteEvent event) {
         if (event.isCancelled()) {
@@ -80,6 +106,10 @@ public final class QuestingListener implements Listener {
         final String quester = event.getQuester();
         final UUID questerId = UUID.fromString(quester);
         final Player player = this.plugin.getServer().getPlayer(questerId);
+
+        if (questInfo.getFinishMessage() != null) {
+            player.sendMessage(questInfo.getFinishMessage());
+        }
 
         if (player == null) {
             // the player has completed a quest without being online. w0t.
@@ -113,6 +143,42 @@ public final class QuestingListener implements Listener {
                         .severe("The quest '" + questInfo.getName()
                                 + "' is incorrectly configured. Rewards for this quest will not work");
             }
+        }
+    }
+
+    /**
+     * @since 0.1.0
+     */
+    @Listen(monitor = true)
+    public void onObjectiveStart(final ObjectiveStartEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
+
+        final Objective objectiveInfo = event.getObjectiveInfo();
+        final String message = objectiveInfo.getBeginMessage();
+        if (message != null) {
+            final Player player = plugin.getServer()
+                    .getPlayer(UUID.fromString(event.getQuester()));
+            player.sendMessage(message);
+        }
+    }
+
+    /**
+     * @since 0.1.0
+     */
+    @Listen(monitor = true)
+    public void onObjectiveComplete(final ObjectiveCompleteEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
+
+        final Outcome outcomeInfo = event.getOutcomeInfo();
+        final String message = outcomeInfo.getFinishMessage();
+        if (message != null) {
+            final Player player = plugin.getServer()
+                    .getPlayer(UUID.fromString(event.getQuester()));
+            player.sendMessage(message);
         }
     }
 }
