@@ -36,6 +36,7 @@ import com.github.rolecraftdev.quests.listener.GuildListener;
 import com.github.rolecraftdev.quests.listener.InventoryListener;
 import com.github.rolecraftdev.quests.listener.PlayerListener;
 import com.github.rolecraftdev.quests.listener.ProfessionListener;
+import com.github.rolecraftdev.quests.quest.QuestSignInteractionHandler;
 import com.github.rolecraftdev.quests.quest.QuestingHandler;
 import com.github.rolecraftdev.quests.quest.QuestingListener;
 
@@ -60,9 +61,18 @@ import java.io.File;
  */
 public final class RolecraftQuests extends JavaPlugin {
     /**
+     * The internal name of the core Rolecraft plugin.
+     *
      * @since 0.1.0
      */
     public static final String CORE_PLUGIN_NAME = "RolecraftCore";
+    /**
+     * The type of {@link com.github.rolecraftdev.sign.RolecraftSign} used for
+     * quest-related signs.
+     *
+     * @since 0.1.0
+     */
+    public static final String QUEST_SIGN_TYPE = "Quest";
 
     private RolecraftCore core;
     private QuestManager questManager;
@@ -136,7 +146,11 @@ public final class RolecraftQuests extends JavaPlugin {
         pluginManager.registerEvents(new ProfessionListener(this), this);
 
         this.dataUpdater = new RQDataUpdater(this);
-        this.dataUpdater.runTaskTimerAsynchronously(this, 6000L, 6000L); // 5 min delay
+        this.dataUpdater
+                .runTaskTimerAsynchronously(this, 6000L, 6000L); // 5 min delay
+
+        core.getSignManager()
+                .registerHandler(new QuestSignInteractionHandler(this));
     }
 
     /**

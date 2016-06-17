@@ -118,4 +118,13 @@ public final class QuestingHandler {
 
         return questManager.getQuestInstance(quest, questerId.toString());
     }
+
+    @Nullable
+    public Quest getQuest(@Nonnull final String questName) {
+        return questManager.getQuest(questName);
+    }
+
+    public boolean questExists(@Nonnull final String questName) {
+        return this.getQuest(questName) != null;
+    }
 }
