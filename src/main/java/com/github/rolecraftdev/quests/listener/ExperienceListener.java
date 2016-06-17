@@ -26,9 +26,19 @@
  */
 package com.github.rolecraftdev.quests.listener;
 
+import com.github.rolecraftdev.event.experience.RCLevelChangeEvent;
 import com.github.rolecraftdev.quests.RolecraftQuests;
+import com.github.rolecraftdev.quests.quest.QuestingHandler;
 
+import com.volumetricpixels.questy.QuestInstance;
+import com.volumetricpixels.questy.objective.ObjectiveProgress;
+
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+
+import java.util.Collection;
 
 /**
  * Listens for experience-related events in order to update quests for Rolecraft.
@@ -40,6 +50,10 @@ public final class ExperienceListener implements Listener {
      * The main {@link RolecraftQuests} plugin instance.
      */
     private final RolecraftQuests plugin;
+    /**
+     * The {@link RolecraftQuests} plugin's {@link QuestingHandler}.
+     */
+    private final QuestingHandler questingHandler;
 
     /**
      * Constructor.
@@ -49,5 +63,42 @@ public final class ExperienceListener implements Listener {
      */
     public ExperienceListener(final RolecraftQuests plugin) {
         this.plugin = plugin;
+        this.questingHandler = plugin.getQuestingHandler();
+    }
+
+    /**
+     * @since 0.1.0
+     */
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onLevelChange(final RCLevelChangeEvent event) {
+        if (event.isLevelDecrease()) {
+            return;
+        }
+
+        final Player player = event.getPlayer();
+        final Collection<QuestInstance> quests = this.questingHandler
+                .getQuests(player);
+
+        for (final QuestInstance quest : quests) {
+            final ObjectiveProgress objective = quest.getCurrentObjective();
+            objective.getOutcomeProgresses().stream()
+                    .filter(outcome -> outcome.getInfo().getType().toLowerCase()
+                            .startsWith("reachlevel"))
+                    .forEach(outcome -> {
+                        final String type = outcome.getInfo().getType()
+                                .toLowerCase();
+                        final String[] split = type.split("_");
+                        if (split.length < 2) {
+                            return;
+                        }
+
+                        // always works if quest is correctly configured
+                        final int level = Integer.parseInt(split[1]);
+                        if (event.getNewLevel() >= level) {
+                            outcome.setProgress(1);
+                            quest.objectiveComplete(objective, outcome);
+                        }
+                    });
+        }
     }
 }
