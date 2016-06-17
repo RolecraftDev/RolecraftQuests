@@ -23,13 +23,19 @@ public final class Objective {
      */
     private final String description;
     /**
+     * The message to be sent to a quester beginning this objective.
+     */
+    private final String beginMessage;
+    /**
      * All of the potential {@link Outcome}s of this {@link Objective}.
      */
     private final Outcome[] outcomes;
 
-    public Objective(String name, String description, Outcome[] outcomes) {
+    public Objective(String name, String description, String beginMessage,
+            Outcome[] outcomes) {
         this.name = name;
         this.description = description;
+        this.beginMessage = beginMessage;
         this.outcomes = outcomes;
     }
 
@@ -41,6 +47,16 @@ public final class Objective {
         return description;
     }
 
+    public String getBeginMessage() {
+        return beginMessage;
+    }
+
+    /**
+     * Gets a (cloned) array of all the possible {@link Outcome}s of this
+     * objective.
+     *
+     * @return all possible outcomes for this objective
+     */
     public Outcome[] getOutcomes() {
         return outcomes.clone();
     }

@@ -11,13 +11,15 @@ package com.volumetricpixels.questy.objective;
 public final class Outcome {
     private final String name;
     private final String description;
+    private final String finishMessage;
     private final String type;
     private final Objective next;
 
-    public Outcome(String name, String description, String type,
-            Objective next) {
+    public Outcome(String name, String description, String finishMessage,
+            String type, Objective next) {
         this.name = name;
         this.description = description;
+        this.finishMessage = finishMessage;
         this.type = type;
         this.next = next;
     }
@@ -28,6 +30,10 @@ public final class Outcome {
 
     public String getDescription() {
         return description;
+    }
+
+    public String getFinishMessage() {
+        return finishMessage;
     }
 
     public String getType() {

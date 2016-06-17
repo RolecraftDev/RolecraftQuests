@@ -85,6 +85,14 @@ public final class QuestBuilder {
      */
     private String description;
     /**
+     * The message to be sent to a quester beginning the quest.
+     */
+    private String beginMessage;
+    /**
+     * The message to be sent to a quester finishing the quest.
+     */
+    private String finishMessage;
+    /**
      * Only holds a non-null value if {@link #build()} has been invoked. Used to
      * allow the same {@link Quest} to be used in multiple places without
      * creating a new {@link Quest} instance.
@@ -122,6 +130,28 @@ public final class QuestBuilder {
      */
     public QuestBuilder description(String description) {
         this.description = description;
+        return this;
+    }
+
+    /**
+     * Sets the message to be sent to a quester beginning the quest.
+     *
+     * @param beginMessage the message to be sent to a quester beginning the quest
+     * @return this {@link QuestBuilder} object
+     */
+    public QuestBuilder beginMessage(String beginMessage) {
+        this.beginMessage = beginMessage;
+        return this;
+    }
+
+    /**
+     * Sets the message to be sent to a quester finishing the quest.
+     *
+     * @param finishMessage the message to be sent to a quester finishing the quest
+     * @return this {@link QuestBuilder} object
+     */
+    public QuestBuilder finishMessage(String finishMessage) {
+        this.finishMessage = finishMessage;
         return this;
     }
 
@@ -193,7 +223,8 @@ public final class QuestBuilder {
         for (int i = 0; i < objs.length; i++) {
             objs[i] = objectives.get(i).build();
         }
-        return built = new Quest(questManager, name, description, objs,
+        return built = new Quest(questManager, name, description, beginMessage,
+                finishMessage, objs,
                 prerequisites.toArray(new String[prerequisites.size()]),
                 rewards.toArray(new String[rewards.size()]));
     }
@@ -224,6 +255,10 @@ public final class QuestBuilder {
          * The description of the {@link Objective} being built.
          */
         private String description;
+        /**
+         * The message to be sent to a player beginning this objective.
+         */
+        private String beginMessage;
         /**
          * Only holds a non-null value if {@link #build()} has been invoked.
          * Used to allow the same {@link Objective} to be used in multiple
@@ -273,6 +308,17 @@ public final class QuestBuilder {
         }
 
         /**
+         * Sets the message to be sent to a quester beginning the objective.
+         *
+         * @param beginMessage the message to be sent to a quester beginning the objective
+         * @return this {@link ObjectiveBuilder} object
+         */
+        public ObjectiveBuilder beginMessage(String beginMessage) {
+            this.beginMessage = beginMessage;
+            return this;
+        }
+
+        /**
          * Obtains an {@link OutcomeBuilder} for an {@link Outcome} with the
          * given {@code name}. A new {@link OutcomeBuilder} is created if there
          * isn't already one with the given name, otherwise the old one is
@@ -314,7 +360,8 @@ public final class QuestBuilder {
             for (int i = 0; i < array.length; i++) {
                 array[i] = outcomes.get(i).build();
             }
-            return built = new Objective(name, description, array);
+            return built = new Objective(name, description, beginMessage,
+                    array);
         }
 
         /**
@@ -329,6 +376,11 @@ public final class QuestBuilder {
              * The description of the {@link Outcome} being built.
              */
             private String description;
+            /**
+             * The message to be sent to a player who achieves this outcome to
+             * an objective they are performing.
+             */
+            private String finishMessage;
             /**
              * The type of the {@link Outcome} being built.
              */
@@ -397,6 +449,18 @@ public final class QuestBuilder {
             }
 
             /**
+             * Sets the message to be sent to a player who achieves this outcome
+             * to an objective they are performing.
+             *
+             * @param finishMessage the new message to be sent to a player who achieves this outcome
+             * @return this {@link OutcomeBuilder} object
+             */
+            public OutcomeBuilder finishMessage(String finishMessage) {
+                this.finishMessage = finishMessage;
+                return this;
+            }
+
+            /**
              * Sets the type of the {@link Outcome} being built to the given
              * {@code type} parameter.
              *
@@ -434,8 +498,8 @@ public final class QuestBuilder {
                     // we already built the Outcome
                     return built;
                 }
-                return built = new Outcome(name, description, type,
-                        next == null ? null : next.build());
+                return built = new Outcome(name, description, finishMessage,
+                        type, next == null ? null : next.build());
             }
         }
     }

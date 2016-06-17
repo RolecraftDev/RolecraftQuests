@@ -30,6 +30,14 @@ public final class Quest {
      */
     private final String description;
     /**
+     * The message sent to a player who has just begun this quest.
+     */
+    private final String beginMessage;
+    /**
+     * The message to be sent to a player who has just finished this quest.
+     */
+    private final String finishMessage;
+    /**
      * All of the {@link Objective}s which are a part of this Quest.
      */
     private final Objective[] objectives;
@@ -58,10 +66,13 @@ public final class Quest {
      * @param prerequisites quests which must be completed to start the Quest
      */
     public Quest(QuestManager questManager, String name, String description,
-            Objective[] objectives, String[] prerequisites, String[] rewards) {
+            String beginMessage, String finishMessage, Objective[] objectives,
+            String[] prerequisites, String[] rewards) {
         this.questManager = questManager;
         this.name = name;
         this.description = description;
+        this.beginMessage = beginMessage;
+        this.finishMessage = finishMessage;
         this.objectives = objectives;
         this.rewards = rewards;
 
@@ -110,6 +121,24 @@ public final class Quest {
      */
     public String getDescription() {
         return description;
+    }
+
+    /**
+     * Gets the message sent to a player who has just begun this quest.
+     *
+     * @return the message sent to a player who has just begun this quest
+     */
+    public String getBeginMessage() {
+        return beginMessage;
+    }
+
+    /**
+     * Gets the message sent to a player who has just finished this quest.
+     *
+     * @return the message sent to a player who has just finished this quest
+     */
+    public String getFinishMessage() {
+        return finishMessage;
     }
 
     /**
