@@ -32,6 +32,7 @@ import com.github.rolecraftdev.quests.quest.QuestingHandler;
 
 import com.volumetricpixels.questy.QuestInstance;
 import com.volumetricpixels.questy.objective.ObjectiveProgress;
+import com.volumetricpixels.questy.objective.OutcomeProgress;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -39,6 +40,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 import java.util.Collection;
+import java.util.Optional;
 
 /**
  * Listens for experience-related events in order to update quests for Rolecraft.
@@ -81,24 +83,15 @@ public final class ExperienceListener implements Listener {
 
         for (final QuestInstance quest : quests) {
             final ObjectiveProgress objective = quest.getCurrentObjective();
-            objective.getOutcomeProgresses().stream()
-                    .filter(outcome -> outcome.getInfo().getType().toLowerCase()
-                            .startsWith("reachlevel"))
-                    .forEach(outcome -> {
-                        final String type = outcome.getInfo().getType()
-                                .toLowerCase();
-                        final String[] split = type.split("_");
-                        if (split.length < 2) {
-                            return;
-                        }
+            final Optional<OutcomeProgress> completedOutcome = questingHandler
+                    .getObjectiveCompletionChecker().checkCompletion(
+                            objective, player.getUniqueId().toString(),
+                            event.getNewLevel());
 
-                        // always works if quest is correctly configured
-                        final int level = Integer.parseInt(split[1]);
-                        if (event.getNewLevel() >= level) {
-                            outcome.setProgress(1);
-                            quest.objectiveComplete(objective, outcome);
-                        }
-                    });
+            if (completedOutcome.isPresent()) {
+                completedOutcome.get().setProgress(1);
+                quest.objectiveComplete(objective, completedOutcome.get());
+            }
         }
     }
 }

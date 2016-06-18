@@ -29,13 +29,16 @@ package com.github.rolecraftdev.quests.quest;
 import com.github.rolecraftdev.quests.RolecraftQuests;
 
 import com.volumetricpixels.questy.Quest;
+import com.volumetricpixels.questy.QuestInstance;
 import com.volumetricpixels.questy.event.Listen;
 import com.volumetricpixels.questy.event.quest.QuestCompleteEvent;
 import com.volumetricpixels.questy.event.quest.QuestStartEvent;
 import com.volumetricpixels.questy.event.quest.objective.ObjectiveCompleteEvent;
 import com.volumetricpixels.questy.event.quest.objective.ObjectiveStartEvent;
 import com.volumetricpixels.questy.objective.Objective;
+import com.volumetricpixels.questy.objective.ObjectiveProgress;
 import com.volumetricpixels.questy.objective.Outcome;
+import com.volumetricpixels.questy.objective.OutcomeProgress;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -43,6 +46,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -63,6 +67,10 @@ public final class QuestingListener implements Listener {
      * The main {@link RolecraftQuests} plugin instance.
      */
     private final RolecraftQuests plugin;
+    /**
+     * The {@link QuestingHandler} instance for the plugin.
+     */
+    private final QuestingHandler questingHandler;
 
     /**
      * Constructor.
@@ -72,6 +80,7 @@ public final class QuestingListener implements Listener {
      */
     public QuestingListener(final RolecraftQuests plugin) {
         this.plugin = plugin;
+        this.questingHandler = plugin.getQuestingHandler();
     }
 
     /**
@@ -161,6 +170,30 @@ public final class QuestingListener implements Listener {
             final Player player = plugin.getServer()
                     .getPlayer(UUID.fromString(event.getQuester()));
             player.sendMessage(message);
+        }
+
+        final QuestInstance quest = event.getQuest();
+        final ObjectiveProgress objective = quest.getCurrentObjective();
+
+        for (final OutcomeProgress outcome : objective.getOutcomeProgresses()) {
+            final Outcome info = outcome.getInfo();
+            final String type = info.getType().toLowerCase();
+
+            if (type.startsWith("reachlevel")) {
+                // if there is an outcome which can be completed prior to the
+                // objective being started, check whether it has already been
+                // completed and update the quest instance object if it has been
+                final Optional<OutcomeProgress> completedOutcome = questingHandler
+                        .getObjectiveCompletionChecker()
+                        .checkCompletion(objective, event.getQuester(),
+                                questingHandler.getPlayerData(
+                                        event.getQuester()).getLevel()); // playerdata should be present as a player must be online to start a quest
+
+                if (completedOutcome.isPresent()) { // outcome completed
+                    quest.objectiveComplete(objective, completedOutcome.get());
+                    break;
+                }
+            } // TODO: add more e.g. guild, profession, once checkers are done
         }
     }
 

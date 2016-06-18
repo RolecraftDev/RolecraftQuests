@@ -27,6 +27,7 @@
 package com.github.rolecraftdev.quests.quest;
 
 import com.github.rolecraftdev.RolecraftCore;
+import com.github.rolecraftdev.data.PlayerData;
 import com.github.rolecraftdev.quests.RolecraftQuests;
 
 import com.volumetricpixels.questy.Quest;
@@ -49,6 +50,7 @@ public final class QuestingHandler {
     private final RolecraftQuests plugin;
     private final RolecraftCore core;
     private final QuestManager questManager;
+    private final QuestObjectiveCompletionChecker objectiveCompletionChecker;
 
     /**
      * Constructor for the RolecraftQuests quest handler, which links the plugin
@@ -61,9 +63,31 @@ public final class QuestingHandler {
         this.plugin = plugin;
         this.core = plugin.getCore();
         this.questManager = plugin.getQuestManager();
+        this.objectiveCompletionChecker = new QuestObjectiveCompletionChecker(
+                plugin);
     }
 
     // TODO: doc
+
+    @Nonnull
+    public QuestObjectiveCompletionChecker getObjectiveCompletionChecker() {
+        return objectiveCompletionChecker;
+    }
+
+    @Nullable
+    public Player getPlayer(@Nonnull final String quester) {
+        return plugin.getServer().getPlayer(UUID.fromString(quester));
+    }
+
+    @Nullable
+    public PlayerData getPlayerData(@Nonnull final String quester) {
+        return core.getDataManager().getPlayerData(UUID.fromString(quester));
+    }
+
+    @Nullable
+    public PlayerData getPlayerData(@Nonnull final Player player) {
+        return getPlayerData(player.getUniqueId().toString());
+    }
 
     @Nonnull
     public Collection<QuestInstance> getQuests(@Nonnull final Player quester) {
