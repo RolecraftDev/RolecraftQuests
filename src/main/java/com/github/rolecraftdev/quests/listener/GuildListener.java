@@ -40,6 +40,8 @@ import org.bukkit.event.Listener;
 
 import java.util.Collection;
 
+import static com.github.rolecraftdev.quests.quest.ObjectiveOutcomeTypes.JOIN_GUILD;
+
 /**
  * Listens for guild-related events in order to update quests for Rolecraft.
  *
@@ -77,9 +79,9 @@ public final class GuildListener implements Listener {
 
         for (final QuestInstance quest : quests) {
             final ObjectiveProgress objective = quest.getCurrentObjective();
-            objective.getOutcomeProgresses().stream()
-                    .filter(outcome -> outcome.getInfo().getType()
-                            .equalsIgnoreCase("joinguild"))
+            objective.getOutcomeProgresses().stream().filter(
+                    outcome -> outcome.getInfo().getType().toLowerCase()
+                            .equals(JOIN_GUILD))
                     .forEach(outcome -> {
                         outcome.setProgress(1);
                         quest.objectiveComplete(objective, outcome);

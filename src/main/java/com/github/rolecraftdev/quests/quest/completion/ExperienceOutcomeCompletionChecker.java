@@ -26,6 +26,7 @@
  */
 package com.github.rolecraftdev.quests.quest.completion;
 
+import com.github.rolecraftdev.quests.RQUtil;
 import com.github.rolecraftdev.quests.quest.QuestingHandler;
 
 import com.volumetricpixels.questy.objective.OutcomeProgress;
@@ -33,6 +34,8 @@ import com.volumetricpixels.questy.objective.OutcomeProgress;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nonnull;
+
+import static com.github.rolecraftdev.quests.quest.ObjectiveOutcomeTypes.REACH_LEVEL;
 
 /**
  * Checks whether a player has reached the required level for an experience
@@ -89,8 +92,8 @@ public class ExperienceOutcomeCompletionChecker
         }
 
         final String type = outcome.getInfo().getType().toLowerCase();
-        if (type.startsWith("reachlevel")) {
-            final String[] split = type.split("_");
+        if (type.startsWith(REACH_LEVEL)) {
+            final String[] split = type.split(RQUtil.REGEX_UNDERSCORE);
             if (split.length < 2) {
                 return false; // invalid outcome type
             }

@@ -40,6 +40,8 @@ import org.bukkit.event.Listener;
 
 import java.util.Collection;
 
+import static com.github.rolecraftdev.quests.quest.ObjectiveOutcomeTypes.SELECT_PROFESSION;
+
 /**
  * Listens for profession-related events in order to update quests for Rolecraft.
  *
@@ -78,8 +80,8 @@ public final class ProfessionListener implements Listener {
         for (final QuestInstance quest : quests) {
             final ObjectiveProgress objective = quest.getCurrentObjective();
             objective.getOutcomeProgresses().stream()
-                    .filter(outcome -> outcome.getInfo().getType()
-                            .equalsIgnoreCase("selectprofession"))
+                    .filter(outcome -> outcome.getInfo().getType().toLowerCase()
+                            .equals(SELECT_PROFESSION))
                     .forEach(outcome -> {
                         outcome.setProgress(1);
                         quest.objectiveComplete(objective, outcome);
