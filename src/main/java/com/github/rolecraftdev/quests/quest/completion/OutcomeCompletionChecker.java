@@ -31,6 +31,7 @@ import com.github.rolecraftdev.quests.quest.QuestingHandler;
 import com.volumetricpixels.questy.objective.OutcomeProgress;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Checks whether a specific outcome has been achieved based on type. Outcome
@@ -64,5 +65,5 @@ public interface OutcomeCompletionChecker {
      */
     boolean checkCompletion(@Nonnull QuestingHandler questingHandler,
             @Nonnull OutcomeProgress outcome, @Nonnull String quester,
-            @Nonnull Object data);
+            @Nullable Object data);
 }

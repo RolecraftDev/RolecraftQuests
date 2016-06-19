@@ -32,6 +32,7 @@ import com.github.rolecraftdev.quests.quest.QuestingHandler;
 
 import com.volumetricpixels.questy.QuestInstance;
 import com.volumetricpixels.questy.objective.ObjectiveProgress;
+import com.volumetricpixels.questy.objective.OutcomeProgress;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -39,6 +40,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 import java.util.Collection;
+import java.util.Optional;
 
 import static com.github.rolecraftdev.quests.quest.ObjectiveOutcomeTypes.JOIN_GUILD;
 
@@ -79,13 +81,15 @@ public final class GuildListener implements Listener {
 
         for (final QuestInstance quest : quests) {
             final ObjectiveProgress objective = quest.getCurrentObjective();
-            objective.getOutcomeProgresses().stream().filter(
-                    outcome -> outcome.getInfo().getType().toLowerCase()
-                            .equals(JOIN_GUILD))
-                    .forEach(outcome -> {
-                        outcome.setProgress(1);
-                        quest.objectiveComplete(objective, outcome);
-                    });
+            final Optional<OutcomeProgress> completedOutcome = questingHandler
+                    .getObjectiveCompletionChecker().checkCompletion(
+                            objective, player.getUniqueId().toString(),
+                            event.getGuild().getId());
+
+            if (completedOutcome.isPresent()) {
+                completedOutcome.get().setProgress(1);
+                quest.objectiveComplete(objective, completedOutcome.get());
+            }
         }
     }
 }

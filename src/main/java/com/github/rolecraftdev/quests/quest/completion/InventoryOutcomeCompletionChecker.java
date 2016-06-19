@@ -30,7 +30,10 @@ import com.github.rolecraftdev.quests.quest.QuestingHandler;
 
 import com.volumetricpixels.questy.objective.OutcomeProgress;
 
+import org.bukkit.inventory.PlayerInventory;
+
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Checks whether a player has achieved an inventory-related outcome.
@@ -75,7 +78,11 @@ public class InventoryOutcomeCompletionChecker
     @Override
     public boolean checkCompletion(@Nonnull QuestingHandler questingHandler,
             @Nonnull OutcomeProgress outcome, @Nonnull String quester,
-            @Nonnull Object data) {
+            @Nullable Object data) {
+        if (data == null || !(data instanceof PlayerInventory)) {
+            return false;
+        }
+        // TODO
         return false;
     }
 }

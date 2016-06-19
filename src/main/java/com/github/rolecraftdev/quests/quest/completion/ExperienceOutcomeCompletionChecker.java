@@ -34,6 +34,7 @@ import com.volumetricpixels.questy.objective.OutcomeProgress;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import static com.github.rolecraftdev.quests.quest.ObjectiveOutcomeTypes.REACH_LEVEL;
 
@@ -81,8 +82,8 @@ public class ExperienceOutcomeCompletionChecker
     @Override
     public boolean checkCompletion(@Nonnull QuestingHandler questingHandler,
             @Nonnull OutcomeProgress outcome, @Nonnull String quester,
-            @Nonnull Object data) {
-        if (!(data instanceof Integer)) {
+            @Nullable Object data) {
+        if (data == null || !(data instanceof Integer)) {
             return false; // this checker isn't relevant
         }
 

@@ -31,6 +31,10 @@ import com.github.rolecraftdev.quests.quest.QuestingHandler;
 import com.volumetricpixels.questy.objective.OutcomeProgress;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.UUID;
+
+import static com.github.rolecraftdev.quests.quest.ObjectiveOutcomeTypes.SELECT_PROFESSION;
 
 /**
  * Checks whether a player has achieved a profession-related outcome.
@@ -75,7 +79,18 @@ public class ProfessionOutcomeCompletionChecker
     @Override
     public boolean checkCompletion(@Nonnull QuestingHandler questingHandler,
             @Nonnull OutcomeProgress outcome, @Nonnull String quester,
-            @Nonnull Object data) {
+            @Nullable Object data) {
+        if (data == null || !(data instanceof UUID)) {
+            return false;
+        }
+
+        final String type = outcome.getInfo().getType().toLowerCase();
+        if (type.equals(SELECT_PROFESSION)) {
+            final UUID uuid = (UUID) data;
+            return questingHandler.getPlugin().getCore().getProfessionManager()
+                    .getProfession(uuid) != null;
+        }
+
         return false;
     }
 }

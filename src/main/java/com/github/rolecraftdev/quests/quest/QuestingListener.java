@@ -50,6 +50,8 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+import static com.github.rolecraftdev.quests.quest.ObjectiveOutcomeTypes.*;
+
 /**
  * Listens for events which may start or hand in a quest etc, e.g. interactions
  * with signs. Also deals with quest rewards.
@@ -179,10 +181,10 @@ public final class QuestingListener implements Listener {
             final Outcome info = outcome.getInfo();
             final String type = info.getType().toLowerCase();
 
-            if (type.startsWith("reachlevel")) {
-                // if there is an outcome which can be completed prior to the
-                // objective being started, check whether it has already been
-                // completed and update the quest instance object if it has been
+            // if there is an outcome which can be completed prior to the
+            // objective being started, check whether it has already been
+            // completed and update the quest instance object if it has been
+            if (type.startsWith(REACH_LEVEL)) {
                 final Optional<OutcomeProgress> completedOutcome = questingHandler
                         .getObjectiveCompletionChecker()
                         .checkCompletion(objective, event.getQuester(),
@@ -193,7 +195,29 @@ public final class QuestingListener implements Listener {
                     quest.objectiveComplete(objective, completedOutcome.get());
                     break;
                 }
-            } // TODO: add more e.g. guild, profession, once checkers are done
+            } else if (type.equals(JOIN_GUILD)) {
+                final Optional<OutcomeProgress> completedOutcome = questingHandler
+                        .getObjectiveCompletionChecker()
+                        .checkCompletion(objective, event.getQuester(),
+                                questingHandler.getPlayerData(
+                                        event.getQuester()).getGuild()); // playerdata should be present as a player must be online to start a quest
+
+                if (completedOutcome.isPresent()) { // outcome completed
+                    quest.objectiveComplete(objective, completedOutcome.get());
+                    break;
+                }
+            } else if (type.equals(SELECT_PROFESSION)) {
+                final Optional<OutcomeProgress> completedOutcome = questingHandler
+                        .getObjectiveCompletionChecker()
+                        .checkCompletion(objective, event.getQuester(),
+                                questingHandler.getPlayerData(
+                                        event.getQuester()).getProfession()); // playerdata should be present as a player must be online to start a quest
+
+                if (completedOutcome.isPresent()) { // outcome completed
+                    quest.objectiveComplete(objective, completedOutcome.get());
+                    break;
+                }
+            }
         }
     }
 

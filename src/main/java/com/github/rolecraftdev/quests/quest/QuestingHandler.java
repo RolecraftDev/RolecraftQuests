@@ -29,6 +29,10 @@ package com.github.rolecraftdev.quests.quest;
 import com.github.rolecraftdev.RolecraftCore;
 import com.github.rolecraftdev.data.PlayerData;
 import com.github.rolecraftdev.quests.RolecraftQuests;
+import com.github.rolecraftdev.quests.quest.completion.ExperienceOutcomeCompletionChecker;
+import com.github.rolecraftdev.quests.quest.completion.GuildOutcomeCompletionChecker;
+import com.github.rolecraftdev.quests.quest.completion.InventoryOutcomeCompletionChecker;
+import com.github.rolecraftdev.quests.quest.completion.ProfessionOutcomeCompletionChecker;
 
 import com.volumetricpixels.questy.Quest;
 import com.volumetricpixels.questy.QuestInstance;
@@ -65,9 +69,23 @@ public final class QuestingHandler {
         this.questManager = plugin.getQuestManager();
         this.objectiveCompletionChecker = new QuestObjectiveCompletionChecker(
                 plugin);
+
+        this.objectiveCompletionChecker.registerOutcomeChecker(
+                new ExperienceOutcomeCompletionChecker(this));
+        this.objectiveCompletionChecker.registerOutcomeChecker(
+                new GuildOutcomeCompletionChecker(this));
+        this.objectiveCompletionChecker.registerOutcomeChecker(
+                new InventoryOutcomeCompletionChecker(this));
+        this.objectiveCompletionChecker.registerOutcomeChecker(
+                new ProfessionOutcomeCompletionChecker(this));
     }
 
     // TODO: doc
+
+    @Nonnull
+    public RolecraftQuests getPlugin() {
+        return plugin;
+    }
 
     @Nonnull
     public QuestObjectiveCompletionChecker getObjectiveCompletionChecker() {
