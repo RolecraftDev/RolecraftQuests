@@ -110,7 +110,7 @@ public final class PlayerListener implements Listener {
             for (final OutcomeProgress outcomeProgress : outcomeProgresses) {
                 final Outcome outcome = outcomeProgress.getInfo();
                 final String[] typeSegments = outcome.getType().split(
-                        RQUtil.REGEX_UNDERSCORE);
+                        RQUtil.QUOTED_UNDERSCORE);
                 final int length = typeSegments.length;
 
                 if (length == 0) {

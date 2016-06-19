@@ -27,8 +27,23 @@
 package com.github.rolecraftdev.quests.listener;
 
 import com.github.rolecraftdev.quests.RolecraftQuests;
+import com.github.rolecraftdev.quests.quest.QuestingHandler;
 
+import com.volumetricpixels.questy.QuestInstance;
+import com.volumetricpixels.questy.objective.ObjectiveProgress;
+import com.volumetricpixels.questy.objective.OutcomeProgress;
+
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryPickupItemEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.PlayerInventory;
+
+import java.util.Collection;
+import java.util.Optional;
 
 /**
  * Listens for inventory-related events in order to update quests for Rolecraft.
@@ -40,6 +55,10 @@ public final class InventoryListener implements Listener {
      * The main {@link RolecraftQuests} plugin instance.
      */
     private final RolecraftQuests plugin;
+    /**
+     * The {@link RolecraftQuests} plugin's {@link QuestingHandler}.
+     */
+    private final QuestingHandler questingHandler;
 
     /**
      * Constructor.
@@ -49,5 +68,37 @@ public final class InventoryListener implements Listener {
      */
     public InventoryListener(final RolecraftQuests plugin) {
         this.plugin = plugin;
+        this.questingHandler = plugin.getQuestingHandler();
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onPickupItem(final InventoryPickupItemEvent event) {
+        final Inventory inventory = event.getInventory();
+        if (!(inventory instanceof PlayerInventory)) {
+            return;
+        }
+
+        final PlayerInventory playerInventory = (PlayerInventory) inventory;
+        final HumanEntity humanEntity = playerInventory.getHolder();
+        if (!(humanEntity instanceof Player)) {
+            return;
+        }
+
+        final Player player = (Player) humanEntity;
+        final Collection<QuestInstance> quests = this.questingHandler
+                .getQuests(player);
+
+        for (final QuestInstance quest : quests) {
+            final ObjectiveProgress objective = quest.getCurrentObjective();
+            final Optional<OutcomeProgress> completedOutcome = questingHandler
+                    .getObjectiveCompletionChecker().checkCompletion(
+                            objective, player.getUniqueId().toString(),
+                            playerInventory);
+
+            if (completedOutcome.isPresent()) {
+                completedOutcome.get().setProgress(1);
+                quest.objectiveComplete(objective, completedOutcome.get());
+            }
+        }
     }
 }

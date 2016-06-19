@@ -94,7 +94,7 @@ public class ExperienceOutcomeCompletionChecker
 
         final String type = outcome.getInfo().getType().toLowerCase();
         if (type.startsWith(REACH_LEVEL)) {
-            final String[] split = type.split(RQUtil.REGEX_UNDERSCORE);
+            final String[] split = type.split(RQUtil.QUOTED_UNDERSCORE);
             if (split.length < 2) {
                 return false; // invalid outcome type
             }

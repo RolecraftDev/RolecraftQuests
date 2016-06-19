@@ -40,6 +40,7 @@ import com.volumetricpixels.questy.objective.ObjectiveProgress;
 import com.volumetricpixels.questy.objective.Outcome;
 import com.volumetricpixels.questy.objective.OutcomeProgress;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -212,6 +213,17 @@ public final class QuestingListener implements Listener {
                         .checkCompletion(objective, event.getQuester(),
                                 questingHandler.getPlayerData(
                                         event.getQuester()).getProfession()); // playerdata should be present as a player must be online to start a quest
+
+                if (completedOutcome.isPresent()) { // outcome completed
+                    quest.objectiveComplete(objective, completedOutcome.get());
+                    break;
+                }
+            } else if (type.equals(ACQUIRE_ITEMS)) {
+                final Optional<OutcomeProgress> completedOutcome = questingHandler
+                        .getObjectiveCompletionChecker()
+                        .checkCompletion(objective, event.getQuester(),
+                                Bukkit.getPlayer(UUID.fromString(
+                                        event.getQuester())).getInventory()); // playerdata should be present as a player must be online to start a quest
 
                 if (completedOutcome.isPresent()) { // outcome completed
                     quest.objectiveComplete(objective, completedOutcome.get());

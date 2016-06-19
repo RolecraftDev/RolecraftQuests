@@ -40,5 +40,12 @@ public abstract class RQUtil {
      *
      * @since 0.1.0
      */
-    public static final String REGEX_UNDERSCORE = Pattern.quote("_");
+    public static final String QUOTED_UNDERSCORE = Pattern.quote("_");
+    /**
+     * A 'quoted' hyphen, usable in regex without inferring the special meaning
+     * of the '-' character.
+     *
+     * @since 0.1.0
+     */
+    public static final String QUOTED_HYPHEN = Pattern.quote("-");
 }

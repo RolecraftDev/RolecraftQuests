@@ -26,14 +26,19 @@
  */
 package com.github.rolecraftdev.quests.quest.completion;
 
+import com.github.rolecraftdev.quests.RQUtil;
 import com.github.rolecraftdev.quests.quest.QuestingHandler;
 
 import com.volumetricpixels.questy.objective.OutcomeProgress;
 
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
+import static com.github.rolecraftdev.quests.quest.ObjectiveOutcomeTypes.ACQUIRE_ITEMS;
 
 /**
  * Checks whether a player has achieved an inventory-related outcome.
@@ -82,7 +87,37 @@ public class InventoryOutcomeCompletionChecker
         if (data == null || !(data instanceof PlayerInventory)) {
             return false;
         }
-        // TODO
+
+        final String type = outcome.getInfo().getType().toLowerCase();
+        if (type.equals(ACQUIRE_ITEMS)) {
+            final String[] split = type.split(RQUtil.QUOTED_UNDERSCORE);
+            if (split.length < 2) {
+                return false; // format: 'acquireitems_ITEMNAME' or 'acquireitems_ITEMNAME_quantity'
+            }
+
+            final Material material = Material.getMaterial(
+                    split[1].replaceAll(RQUtil.QUOTED_HYPHEN,
+                            RQUtil.QUOTED_UNDERSCORE));
+            if (material == null) {
+                return false; // invalid quest
+            }
+
+            int quantity = 1;
+            if (split.length > 2) {
+                quantity = Integer.parseInt(split[2]); // NFE = invalid quest
+            }
+
+            final PlayerInventory inventory = (PlayerInventory) data;
+            int amountInInventory = 0;
+            for (final ItemStack stack : inventory.getContents()) {
+                if (stack.getType().equals(material)) {
+                    amountInInventory += stack.getAmount();
+                }
+            }
+
+            return amountInInventory >= quantity;
+        }
+
         return false;
     }
 }

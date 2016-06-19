@@ -42,8 +42,6 @@ import org.bukkit.event.Listener;
 import java.util.Collection;
 import java.util.Optional;
 
-import static com.github.rolecraftdev.quests.quest.ObjectiveOutcomeTypes.JOIN_GUILD;
-
 /**
  * Listens for guild-related events in order to update quests for Rolecraft.
  *

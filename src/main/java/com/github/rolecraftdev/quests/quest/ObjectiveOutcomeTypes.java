@@ -64,4 +64,10 @@ public abstract class ObjectiveOutcomeTypes {
      * @since 0.1.0
      */
     public static final String REACH_LEVEL = "reachlevel";
+    /**
+     * An outcome which requires the player to collect a certain item(s).
+     *
+     * @since 0.1.0
+     */
+    public static final String ACQUIRE_ITEMS = "acquireitems";
 }
