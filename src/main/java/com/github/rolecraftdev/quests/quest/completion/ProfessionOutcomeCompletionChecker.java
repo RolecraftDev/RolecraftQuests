@@ -45,6 +45,8 @@ public class ProfessionOutcomeCompletionChecker
         implements OutcomeCompletionChecker {
     /**
      * The name of this {@link OutcomeCompletionChecker}'s type.
+     *
+     * @since 0.1.0
      */
     public static final String TYPE = "profession";
 

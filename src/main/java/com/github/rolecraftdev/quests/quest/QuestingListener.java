@@ -38,20 +38,15 @@ import com.volumetricpixels.questy.event.quest.objective.ObjectiveStartEvent;
 import com.volumetricpixels.questy.objective.Objective;
 import com.volumetricpixels.questy.objective.ObjectiveProgress;
 import com.volumetricpixels.questy.objective.Outcome;
-import com.volumetricpixels.questy.objective.OutcomeProgress;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Pattern;
-
-import static com.github.rolecraftdev.quests.quest.ObjectiveOutcomeTypes.*;
 
 /**
  * Listens for events which may start or hand in a quest etc, e.g. interactions
@@ -169,68 +164,16 @@ public final class QuestingListener implements Listener {
 
         final Objective objectiveInfo = event.getObjectiveInfo();
         final String message = objectiveInfo.getBeginMessage();
+        final Player player = plugin.getServer()
+                .getPlayer(UUID.fromString(event.getQuester()));
         if (message != null) {
-            final Player player = plugin.getServer()
-                    .getPlayer(UUID.fromString(event.getQuester()));
             player.sendMessage(message);
         }
 
         final QuestInstance quest = event.getQuest();
         final ObjectiveProgress objective = quest.getCurrentObjective();
 
-        for (final OutcomeProgress outcome : objective.getOutcomeProgresses()) {
-            final Outcome info = outcome.getInfo();
-            final String type = info.getType().toLowerCase();
-
-            // if there is an outcome which can be completed prior to the
-            // objective being started, check whether it has already been
-            // completed and update the quest instance object if it has been
-            if (type.startsWith(REACH_LEVEL)) {
-                final Optional<OutcomeProgress> completedOutcome = questingHandler
-                        .getObjectiveCompletionChecker()
-                        .checkCompletion(objective, event.getQuester(),
-                                questingHandler.getPlayerData(
-                                        event.getQuester()).getLevel()); // playerdata should be present as a player must be online to start a quest
-
-                if (completedOutcome.isPresent()) { // outcome completed
-                    quest.objectiveComplete(objective, completedOutcome.get());
-                    break;
-                }
-            } else if (type.equals(JOIN_GUILD)) {
-                final Optional<OutcomeProgress> completedOutcome = questingHandler
-                        .getObjectiveCompletionChecker()
-                        .checkCompletion(objective, event.getQuester(),
-                                questingHandler.getPlayerData(
-                                        event.getQuester()).getGuild()); // playerdata should be present as a player must be online to start a quest
-
-                if (completedOutcome.isPresent()) { // outcome completed
-                    quest.objectiveComplete(objective, completedOutcome.get());
-                    break;
-                }
-            } else if (type.equals(SELECT_PROFESSION)) {
-                final Optional<OutcomeProgress> completedOutcome = questingHandler
-                        .getObjectiveCompletionChecker()
-                        .checkCompletion(objective, event.getQuester(),
-                                questingHandler.getPlayerData(
-                                        event.getQuester()).getProfession()); // playerdata should be present as a player must be online to start a quest
-
-                if (completedOutcome.isPresent()) { // outcome completed
-                    quest.objectiveComplete(objective, completedOutcome.get());
-                    break;
-                }
-            } else if (type.equals(ACQUIRE_ITEMS)) {
-                final Optional<OutcomeProgress> completedOutcome = questingHandler
-                        .getObjectiveCompletionChecker()
-                        .checkCompletion(objective, event.getQuester(),
-                                Bukkit.getPlayer(UUID.fromString(
-                                        event.getQuester())).getInventory()); // playerdata should be present as a player must be online to start a quest
-
-                if (completedOutcome.isPresent()) { // outcome completed
-                    quest.objectiveComplete(objective, completedOutcome.get());
-                    break;
-                }
-            }
-        }
+        questingHandler.checkCompletion(player, objective);
     }
 
     /**

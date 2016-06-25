@@ -29,21 +29,29 @@ package com.github.rolecraftdev.quests.quest;
 import com.github.rolecraftdev.RolecraftCore;
 import com.github.rolecraftdev.data.PlayerData;
 import com.github.rolecraftdev.quests.RolecraftQuests;
+import com.github.rolecraftdev.quests.quest.completion.EconomyOutcomeCompletionChecker;
 import com.github.rolecraftdev.quests.quest.completion.ExperienceOutcomeCompletionChecker;
 import com.github.rolecraftdev.quests.quest.completion.GuildOutcomeCompletionChecker;
 import com.github.rolecraftdev.quests.quest.completion.InventoryOutcomeCompletionChecker;
 import com.github.rolecraftdev.quests.quest.completion.ProfessionOutcomeCompletionChecker;
+import com.github.rolecraftdev.quests.task.CompletionCheckTask;
 
 import com.volumetricpixels.questy.Quest;
 import com.volumetricpixels.questy.QuestInstance;
 import com.volumetricpixels.questy.QuestManager;
+import com.volumetricpixels.questy.objective.ObjectiveProgress;
+import com.volumetricpixels.questy.objective.Outcome;
+import com.volumetricpixels.questy.objective.OutcomeProgress;
 
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.UUID;
+
+import static com.github.rolecraftdev.quests.quest.ObjectiveOutcomeTypes.*;
 
 /**
  * Handles the linking of RolecraftQuests with the Questy framework.
@@ -51,6 +59,11 @@ import java.util.UUID;
  * @since 0.1.0
  */
 public final class QuestingHandler {
+    /**
+     * Five seconds.
+     */
+    private static final long CHECK_PERIOD = 100L;
+
     private final RolecraftQuests plugin;
     private final RolecraftCore core;
     private final QuestManager questManager;
@@ -78,9 +91,72 @@ public final class QuestingHandler {
                 new InventoryOutcomeCompletionChecker(this));
         this.objectiveCompletionChecker.registerOutcomeChecker(
                 new ProfessionOutcomeCompletionChecker(this));
+        this.objectiveCompletionChecker.registerOutcomeChecker(
+                new EconomyOutcomeCompletionChecker(this));
+
+        new CompletionCheckTask(plugin)
+                .runTaskTimer(plugin, CHECK_PERIOD, CHECK_PERIOD);
     }
 
     // TODO: doc
+
+    public void checkCompletion(@Nonnull final Player player,
+            @Nonnull final ObjectiveProgress objective) {
+        final QuestInstance quest = objective.getQuest();
+        final String quester = player.getUniqueId().toString();
+
+        for (final OutcomeProgress outcome : objective.getOutcomeProgresses()) {
+            final Outcome info = outcome.getInfo();
+            final String type = info.getType().toLowerCase();
+
+            if (type.startsWith(REACH_LEVEL)) {
+                final Optional<OutcomeProgress> completedOutcome = objectiveCompletionChecker
+                        .checkCompletion(objective, quester,
+                                getPlayerData(quester).getLevel());
+
+                if (completedOutcome.isPresent()) {
+                    quest.objectiveComplete(objective, completedOutcome.get());
+                    break;
+                }
+            } else if (type.equals(JOIN_GUILD)) {
+                final Optional<OutcomeProgress> completedOutcome = objectiveCompletionChecker
+                        .checkCompletion(objective, quester,
+                                getPlayerData(quester).getGuild());
+
+                if (completedOutcome.isPresent()) { // outcome completed
+                    quest.objectiveComplete(objective, completedOutcome.get());
+                    break;
+                }
+            } else if (type.equals(SELECT_PROFESSION)) {
+                final Optional<OutcomeProgress> completedOutcome = objectiveCompletionChecker
+                        .checkCompletion(objective, quester,
+                                getPlayerData(quester).getProfession());
+
+                if (completedOutcome.isPresent()) {
+                    quest.objectiveComplete(objective, completedOutcome.get());
+                    break;
+                }
+            } else if (type.equals(ACQUIRE_ITEMS)) {
+                final Optional<OutcomeProgress> completedOutcome = objectiveCompletionChecker
+                        .checkCompletion(objective, quester,
+                                player.getInventory());
+
+                if (completedOutcome.isPresent()) {
+                    quest.objectiveComplete(objective, completedOutcome.get());
+                    break;
+                }
+            } else if (type.equals(ACQUIRE_MONEY)) {
+                final Optional<OutcomeProgress> completedOutcome = objectiveCompletionChecker
+                        .checkCompletion(objective, quester, plugin.getCore()
+                                .getVaultEcon().getBalance(player));
+
+                if (completedOutcome.isPresent()) {
+                    quest.objectiveComplete(objective, completedOutcome.get());
+                    break;
+                }
+            }
+        }
+    }
 
     @Nonnull
     public RolecraftQuests getPlugin() {

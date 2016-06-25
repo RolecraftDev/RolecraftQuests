@@ -70,4 +70,10 @@ public abstract class ObjectiveOutcomeTypes {
      * @since 0.1.0
      */
     public static final String ACQUIRE_ITEMS = "acquireitems";
+    /**
+     * An outcome which requires the player to collect a certain amount of money.
+     *
+     * @since 0.1.0
+     */
+    public static final String ACQUIRE_MONEY = "acquiremoney";
 }
